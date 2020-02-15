@@ -2,10 +2,13 @@ var snake = null;
 var scale;
 
 var food;
+var stopped = false;
+var speed = 10;
+
 
 function setup() {
   createCanvas(600,600);
-  frameRate(10);
+  frameRate(this.speed);
  
   this.scale = 20;
   this.pickLoction();
@@ -21,20 +24,46 @@ function pickLoction() {
   food.mult(scale);
 }
 
+function deadState() {
+  textSize(72);
+  textAlign(CENTER, CENTER);
+  text('You died', (width / 2), (height / 2));
+  
+  textSize(18);
+  text('Press space to play again', (width / 2), (height / 2) +50 );
+  
+  this.stopped = true;
+}
+
+function reset() {
+  snake.reset();
+  this.pickLoction();
+  
+  this.stopped = false;
+}
+
 function draw() {
   background(51);
-  
+  frameRate(this.speed);
+ 
   // snake
-  if(snake.isDead()) {
-    snake.reset();
-    this.pickLoction();
-  }
+  textSize(24);
+  textAlign(CENTER, CENTER);
+  text('Score: ' + snake.total, 50, 20);
+  
   
   snake.update(scale);
+  if(snake.isDead()) {
+    this.deadState();
+    this.speed = 10;
+    return; 
+  }
+  
   snake.show();
   
   if(snake.eat(food)){
     this.pickLoction();
+    this.speed = this.speed +1;
   }
   
   // Food
@@ -43,6 +72,17 @@ function draw() {
 }
 
 function keyPressed() {
+  if(this.stopped === true)
+  {
+    if(keyCode === 32)
+    {
+      this.reset();
+      return;
+    }
+    
+    return;
+  }
+  
   if (keyCode === LEFT_ARROW) {
     snake.moveLeft();
   } else if (keyCode === RIGHT_ARROW) {
@@ -54,7 +94,7 @@ function keyPressed() {
   }
 }
 
-function mousePressed() {
+function mousePressed() {  
   snake.total = snake.total +1;
 }
 
@@ -135,21 +175,37 @@ function Snake() {
   };
   
   this.moveUp = function(){
+    if(this.yspeed === 1){ 
+      return;
+    }
+    
     this.yspeed = -1;
     this.xspeed = 0;
   };
   
   this.moveDown = function(){
+    if(this.yspeed === -1){ 
+      return;
+    }
+    
     this.yspeed = 1;
     this.xspeed = 0;
   };
   
   this.moveLeft = function(){
+    if(this.xspeed === 1){ 
+      return;
+    }
+    
     this.xspeed = -1;
     this.yspeed = 0;
   };
   
   this.moveRight = function(){
+    if(this.xspeed === -1){ 
+      return;
+    }
+    
     this.xspeed = 1;
     this.yspeed = 0;
   };
